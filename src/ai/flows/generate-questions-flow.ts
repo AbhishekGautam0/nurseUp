@@ -64,7 +64,7 @@ const generateQuestionsFlow = ai.defineFlow(
     inputSchema: GenerateQuestionsInputSchema,
     outputSchema: GenerateQuestionsOutputSchema,
     config: {
-        retries: 2, // Retry up to 2 times if the output validation fails
+        retries: 3, // Retry up to 3 times if the output validation fails
     }
   },
   async (input) => {
