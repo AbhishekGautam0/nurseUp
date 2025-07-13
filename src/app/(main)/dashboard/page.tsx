@@ -1,7 +1,24 @@
-import { tests } from "@/lib/data";
+
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useTestStore } from '@/hooks/use-test-store';
 import { TestCard } from "@/components/test-card";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function Dashboard() {
+  const { tests } = useTestStore();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+     return <div className="container py-8">Loading tests...</div>;
+  }
+
   const activeTests = tests.filter((test) => test.category === 'active');
   const practiceTests = tests.filter((test) => test.category === 'practice');
 
@@ -29,7 +46,13 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">The practice library is empty. Use the 'Generate Questions' feature to create a new test!</p>
+          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-12 text-center">
+            <h3 className="mt-4 text-xl font-semibold">The Practice Library is Empty</h3>
+            <p className="mt-2 text-muted-foreground">Use the 'Generate Questions' feature to create a new test!</p>
+            <Button asChild className="mt-6">
+                <Link href="/generate">Generate a Test</Link>
+            </Button>
+        </div>
         )}
       </section>
     </div>

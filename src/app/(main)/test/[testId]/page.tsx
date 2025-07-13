@@ -1,8 +1,8 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { tests } from '@/lib/data';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import { useTestStore, type AnswersState } from '@/hooks/use-test-store';
 
 import { Button } from '@/components/ui/button';
@@ -28,22 +28,29 @@ export default function TestPage() {
   const router = useRouter();
   const params = useParams();
   const testId = params.testId as string;
-  const setTestResult = useTestStore((state) => state.setTestResult);
+  const { setTestResult, getTest } = useTestStore();
 
-  const [test, setTest] = useState(tests.find((t) => t.id === testId));
+  const [test, setTest] = useState(getTest(testId));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswersState>({});
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    const foundTest = tests.find((t) => t.id === testId);
+    const foundTest = getTest(testId);
     if (!foundTest) {
-      router.push('/dashboard');
+       setTimeout(() => {
+        const refoundTest = getTest(testId);
+        if (!refoundTest) {
+          notFound();
+        } else {
+           setTest(refoundTest);
+        }
+      }, 500);
     } else {
       setTest(foundTest);
     }
-  }, [testId, router]);
+  }, [testId, getTest, router]);
 
   const handleAnswerChange = (questionId: string, answer: string[]) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));

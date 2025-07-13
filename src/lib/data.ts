@@ -1,3 +1,4 @@
+
 export type Option = {
   id: string;
   text: string;
@@ -20,7 +21,7 @@ export type Test = {
   category: 'active' | 'practice';
 };
 
-export const tests: Test[] = [
+export const initialTests: Test[] = [
   {
     id: 'norcet-practice-1',
     title: 'NORCET Practice Exam I',
@@ -266,7 +267,7 @@ export const tests: Test[] = [
           { id: 'a', text: '30 km' },
           { id: 'b', text: '45 km' },
           { id: 'c', text: '50 km' },
-          { id: 'd', text: '60 km' },
+          { id: 'd', 'text': '60 km' },
         ],
         correctAnswers: ['b'],
         type: 'single',

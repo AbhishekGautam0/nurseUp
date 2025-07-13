@@ -1,25 +1,31 @@
+
 "use client"
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTestStore } from '@/hooks/use-test-store';
-import { tests, type Test } from '@/lib/data';
+import { type Test } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { History, ArrowRight } from 'lucide-react';
 
 export default function ReviewListPage() {
+  const { tests, results } = useTestStore();
   const [completedTests, setCompletedTests] = useState<Test[]>([]);
-  const { results } = useTestStore();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    const completedIds = Object.keys(results);
-    const filteredTests = tests.filter(test => completedIds.includes(test.id));
-    setCompletedTests(filteredTests);
-  }, [results]);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      const completedIds = Object.keys(results);
+      const filteredTests = tests.filter(test => completedIds.includes(test.id));
+      setCompletedTests(filteredTests);
+    }
+  }, [results, tests, isClient]);
 
   if (!isClient) {
     return <div className="container py-8">Loading reviewable tests...</div>;
@@ -33,6 +39,8 @@ export default function ReviewListPage() {
         <div className="space-y-6">
           {completedTests.map(test => {
             const result = results[test.id];
+            // Handle case where result might not exist yet
+            if (!result) return null;
             return (
               <Card key={test.id} className="transition-shadow hover:shadow-md">
                 <CardHeader>

@@ -1,11 +1,11 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import Link from 'next/link';
 
 import { useTestStore } from '@/hooks/use-test-store';
-import { tests } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { ResultsSummary } from '@/components/results-summary';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
@@ -15,20 +15,25 @@ export default function ResultsPage() {
   const router = useRouter();
   const params = useParams();
   const testId = params.testId as string;
-  const { getTestResult } = useTestStore();
+  const { getTestResult, getTest } = useTestStore();
 
   const [score, setScore] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  
+  const test = getTest(testId);
 
   useEffect(() => {
     setIsClient(true);
-    const test = tests.find((t) => t.id === testId);
     const result = getTestResult(testId);
 
     if (!test || !result) {
-      // Maybe redirect to dashboard if no result is found
-      // router.push('/dashboard');
+      setTimeout(() => {
+          const recheckResult = getTestResult(testId);
+          if(!getTest(testId) || !recheckResult) {
+            // notFound();
+          }
+      }, 500)
       return;
     }
 
@@ -45,13 +50,16 @@ export default function ResultsPage() {
 
     setScore(correctAnswers);
     setTotalQuestions(test.questions.length);
-  }, [testId, getTestResult, router]);
+  }, [testId, getTestResult, router, test]);
 
   if (!isClient) {
     return <div className="flex h-screen items-center justify-center">Calculating results...</div>;
   }
 
-  const test = tests.find((t) => t.id === testId);
+  if (!test) {
+      return <div className="flex h-screen items-center justify-center">Loading results...</div>;
+  }
+
   const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
   
   return (

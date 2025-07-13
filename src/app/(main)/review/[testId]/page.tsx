@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter, notFound } from 'next/navigation';
 import { useTestStore } from '@/hooks/use-test-store';
-import { tests, type Test } from '@/lib/data';
+import { type Test } from '@/lib/data';
 
 import { Button } from '@/components/ui/button';
 import { ReviewQuestion } from '@/components/review-question';
@@ -13,7 +14,7 @@ export default function ReviewPage() {
   const router = useRouter();
   const params = useParams();
   const testId = params.testId as string;
-  const { getTestResult } = useTestStore();
+  const { getTestResult, tests, getTest } = useTestStore();
 
   const [test, setTest] = useState<Test | undefined>();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -21,13 +22,23 @@ export default function ReviewPage() {
 
   useEffect(() => {
     setIsClient(true);
-    const foundTest = tests.find((t) => t.id === testId);
+    const foundTest = getTest(testId);
     const result = getTestResult(testId);
     if (!foundTest || !result) {
-      notFound();
+      // Allow some time for store to hydrate
+      setTimeout(() => {
+        const refoundTest = getTest(testId);
+        const recheckResult = getTestResult(testId);
+        if (!refoundTest || !recheckResult) {
+          notFound();
+        } else {
+           setTest(refoundTest);
+        }
+      }, 500);
+    } else {
+        setTest(foundTest);
     }
-    setTest(foundTest);
-  }, [testId, getTestResult, router]);
+  }, [testId, getTestResult, getTest]);
 
   const goToNext = () => {
     if (test && currentQuestionIndex < test.questions.length - 1) {

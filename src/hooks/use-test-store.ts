@@ -1,5 +1,8 @@
+
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { type Test, type Question } from '@/lib/data';
+import { initialTests } from '@/lib/data';
 
 export type AnswersState = { [questionId: string]: string[] };
 
@@ -9,6 +12,9 @@ type TestResult = {
 };
 
 type TestStore = {
+  tests: Test[];
+  addTest: (test: Test) => void;
+  getTest: (testId: string) => Test | undefined;
   results: {
     [testId: string]: TestResult;
   };
@@ -19,6 +25,9 @@ type TestStore = {
 export const useTestStore = create<TestStore>()(
   persist(
     (set, get) => ({
+      tests: initialTests,
+      addTest: (test) => set((state) => ({ tests: [...state.tests, test] })),
+      getTest: (testId: string) => get().tests.find((t) => t.id === testId),
       results: {},
       getTestResult: (testId: string) => get().results[testId],
       setTestResult: (testId, answers) =>
