@@ -14,6 +14,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import type { Test, Question } from '@/lib/data';
 import { useRouter } from 'next/navigation';
+import { QuestionDisplay } from '@/components/question-display';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+
+// Helper to add temporary unique IDs to questions for rendering
+const withTempIds = (questions: Question[]): Question[] => {
+    return questions.map((q, index) => ({
+        ...q,
+        id: `temp-${Date.now()}-${index}`
+    }));
+}
+
 
 export default function GeneratePage() {
   const [topic, setTopic] = useState('Cardiology');
@@ -36,7 +48,13 @@ export default function GeneratePage() {
     setNewTestDescription(`A set of ${count} AI-generated questions about ${topic}.`);
     try {
       const generated = await generateQuestions({ topic, count });
-      setResult(generated);
+       if (generated && generated.questions) {
+        // Assign temporary unique IDs for the review UI
+        const questionsWithTempIds = withTempIds(generated.questions as Question[]);
+        setResult({ questions: questionsWithTempIds });
+      } else {
+        setResult(generated); // handle case where generation might be empty
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -63,7 +81,7 @@ export default function GeneratePage() {
       title: newTestTitle,
       description: newTestDescription,
       duration: result.questions.length * 2, // 2 mins per question
-      questions: result.questions as Question[],
+      questions: result.questions.map((q, index) => ({...q, id: `q-${index}`})) as Question[], // Finalize IDs on save
       category: 'practice',
     };
     
@@ -132,7 +150,7 @@ export default function GeneratePage() {
         <div className="space-y-8">
             <Card className={result ? '' : 'opacity-50'}>
                 <CardHeader>
-                    <CardTitle>2. Test Details</CardTitle>
+                    <CardTitle>2. Test Details & Review</CardTitle>
                     <CardDescription>Review the generated questions and give your new test a title.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -156,18 +174,31 @@ export default function GeneratePage() {
                         disabled={!result || loading}
                         />
                     </div>
-                     <div className="relative h-64 w-full rounded-md bg-muted p-4">
+                     <div className="relative h-[450px] w-full rounded-md border bg-muted p-1">
                         {loading ? (
-                            <div className="space-y-4">
+                            <div className="space-y-4 p-4">
                             <Skeleton className="h-12 w-full" />
                             <Skeleton className="h-8 w-3/4" />
                             <Skeleton className="h-8 w-4/5" />
                             <Skeleton className="h-8 w-2/3" />
                             </div>
                         ) : result ? (
-                            <pre className="h-full w-full overflow-auto text-sm">
-                            <code>{JSON.stringify(result.questions, null, 2)}</code>
-                            </pre>
+                           <ScrollArea className="h-full w-full rounded-md bg-background p-4">
+                             <div className="space-y-6">
+                                {result.questions.map((q, i) => (
+                                    <div key={q.id}>
+                                        <QuestionDisplay
+                                            question={q as Question}
+                                            questionNumber={i + 1}
+                                            totalQuestions={result.questions.length}
+                                            userAnswer={[]}
+                                            onAnswerChange={() => {}} // No-op on review page
+                                        />
+                                        {i < result.questions.length - 1 && <Separator className="mt-6" />}
+                                    </div>
+                                ))}
+                             </div>
+                           </ScrollArea>
                         ) : (
                             <div className="flex h-full items-center justify-center text-center text-muted-foreground">
                                 <p>Generated questions will appear here for review.</p>
