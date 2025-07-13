@@ -1,15 +1,21 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 
 interface TestTimerProps {
-  initialMinutes: number;
+  initialSeconds: number;
   onTimeUp: () => void;
+  onTick: (secondsLeft: number) => void;
 }
 
-export function TestTimer({ initialMinutes, onTimeUp }: TestTimerProps) {
-  const [timeLeft, setTimeLeft] = useState(initialMinutes * 60);
+export function TestTimer({ initialSeconds, onTimeUp, onTick }: TestTimerProps) {
+  const [timeLeft, setTimeLeft] = useState(initialSeconds);
+
+  useEffect(() => {
+    setTimeLeft(initialSeconds);
+  }, [initialSeconds]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -18,11 +24,15 @@ export function TestTimer({ initialMinutes, onTimeUp }: TestTimerProps) {
     }
 
     const timer = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
+        setTimeLeft((prevTime) => {
+            const newTime = prevTime - 1;
+            onTick(newTime);
+            return newTime;
+        });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, onTimeUp]);
+  }, [timeLeft, onTimeUp, onTick]);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;

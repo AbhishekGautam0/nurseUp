@@ -6,14 +6,24 @@ import { useTestStore } from '@/hooks/use-test-store';
 import { TestCard } from "@/components/test-card";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Dashboard() {
-  const { tests } = useTestStore();
+  const { tests, deleteTest } = useTestStore();
   const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleDeleteTest = (testId: string) => {
+    deleteTest(testId);
+    toast({
+        title: "Test Deleted",
+        description: "The practice test has been removed from your library.",
+    })
+  };
 
   if (!isClient) {
      return <div className="container py-8">Loading tests...</div>;
@@ -38,11 +48,16 @@ export default function Dashboard() {
       )}
 
       <section className={activeTests.length > 0 ? "mt-12" : ""}>
-        <h2 className="mb-4 text-2xl font-semibold">Practice Library</h2>
+        <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">Practice Library</h2>
+             <Button asChild variant="outline">
+                <Link href="/generate">Generate New Test</Link>
+            </Button>
+        </div>
         {practiceTests.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {practiceTests.map((test) => (
-              <TestCard key={test.id} test={test} />
+              <TestCard key={test.id} test={test} onDelete={handleDeleteTest} />
             ))}
           </div>
         ) : (

@@ -14,6 +14,7 @@ type TestResult = {
 type TestStore = {
   tests: Test[];
   addTest: (test: Test) => void;
+  deleteTest: (testId: string) => void;
   getTest: (testId: string) => Test | undefined;
   results: {
     [testId: string]: TestResult;
@@ -27,6 +28,7 @@ export const useTestStore = create<TestStore>()(
     (set, get) => ({
       tests: initialTests,
       addTest: (test) => set((state) => ({ tests: [...state.tests, test] })),
+      deleteTest: (testId) => set((state) => ({ tests: state.tests.filter(t => t.id !== testId) })),
       getTest: (testId: string) => get().tests.find((t) => t.id === testId),
       results: {},
       getTestResult: (testId: string) => get().results[testId],

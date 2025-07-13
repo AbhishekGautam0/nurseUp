@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter, notFound } from 'next/navigation';
 import { useTestStore, type AnswersState } from '@/hooks/use-test-store';
 
@@ -38,13 +38,13 @@ function QuestionGrid({ questions, currentQuestionIndex, answers, onQuestionSele
         {questions.map((q, i) => (
           <Button
             key={q.id}
-            variant={currentQuestionIndex === i ? 'default' : answers[q.id]?.length > 0 ? 'secondary' : 'outline'}
+            variant={currentQuestionIndex === i ? 'default' : (answers[q.id] && answers[q.id].length > 0) ? 'secondary' : 'outline'}
             size="icon"
             onClick={() => onQuestionSelect(i)}
             className={cn(
               "h-10 w-10 rounded-full transition-all duration-200", 
               currentQuestionIndex === i && "ring-2 ring-primary-foreground ring-offset-2 ring-offset-primary scale-110",
-              answers[q.id]?.length > 0 && "bg-green-600 hover:bg-green-700 text-white"
+              (answers[q.id] && answers[q.id].length > 0) && "bg-green-600 hover:bg-green-700 text-white"
               )}
           >
             {i + 1}
@@ -63,9 +63,13 @@ export default function TestPage() {
   const [test, setTest] = useState<Test | undefined>();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswersState>({});
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+  const getSessionStorageKey = useCallback(() => `test-session-${testId}`, [testId]);
+
+  // Load state from session storage on mount
   useEffect(() => {
     setIsClient(true);
     const foundTest = getTest(testId);
@@ -80,18 +84,54 @@ export default function TestPage() {
       }, 500);
     } else {
       setTest(foundTest);
+      try {
+        const savedState = sessionStorage.getItem(getSessionStorageKey());
+        if (savedState) {
+          const { savedAnswers, savedTimeLeft, savedQuestionIndex } = JSON.parse(savedState);
+          setAnswers(savedAnswers);
+          setTimeLeft(savedTimeLeft);
+          setCurrentQuestionIndex(savedQuestionIndex);
+        } else {
+          setTimeLeft(foundTest.duration * 60);
+        }
+      } catch (error) {
+        console.error("Could not load test state from session storage", error);
+        setTimeLeft(foundTest.duration * 60);
+      }
     }
-  }, [testId, getTest, router]);
+  }, [testId, getTest, router, getSessionStorageKey]);
+  
+  // Save state to session storage whenever it changes
+  useEffect(() => {
+      if (!isClient || timeLeft === null) return;
+      try {
+          const stateToSave = {
+              savedAnswers: answers,
+              savedTimeLeft: timeLeft,
+              savedQuestionIndex: currentQuestionIndex,
+          };
+          sessionStorage.setItem(getSessionStorageKey(), JSON.stringify(stateToSave));
+      } catch (error) {
+          console.error("Could not save test state to session storage", error)
+      }
+
+  }, [answers, timeLeft, currentQuestionIndex, isClient, getSessionStorageKey]);
+
 
   const handleAnswerChange = (questionId: string, answer: string[]) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!test) return;
     setTestResult(test.id, answers);
+    sessionStorage.removeItem(getSessionStorageKey());
     router.push(`/test/${test.id}/results`);
-  };
+  }, [test, answers, setTestResult, router, getSessionStorageKey]);
+
+  const handleTimeUp = useCallback(() => {
+    handleSubmit();
+  }, [handleSubmit]);
 
   const goToNext = () => {
     if (test && currentQuestionIndex < test.questions.length - 1) {
@@ -110,7 +150,7 @@ export default function TestPage() {
     setIsSheetOpen(false); // Close sheet on selection
   }
 
-  if (!isClient || !test) {
+  if (!isClient || !test || timeLeft === null) {
     return <div className="flex h-screen items-center justify-center">Loading test...</div>;
   }
   
@@ -127,10 +167,11 @@ export default function TestPage() {
               <h1 className="font-headline text-3xl font-bold">{test.title}</h1>
               <p className="text-muted-foreground">{test.description}</p>
             </div>
-            <TestTimer initialMinutes={test.duration} onTimeUp={handleSubmit} />
+            <TestTimer initialSeconds={timeLeft} onTimeUp={handleTimeUp} onTick={setTimeLeft} />
           </header>
           
           <QuestionDisplay
+            key={currentQuestion.id}
             question={currentQuestion}
             questionNumber={currentQuestionIndex + 1}
             totalQuestions={test.questions.length}
@@ -154,7 +195,7 @@ export default function TestPage() {
           <Card className="sticky top-24">
             <CardHeader>
               <CardTitle className="text-lg">Questions</CardTitle>
-              <CardDescription>{Object.keys(answers).filter(k => answers[k].length > 0).length} / {test.questions.length} Answered</CardDescription>
+              <CardDescription>{Object.values(answers).filter(a => a.length > 0).length} / {test.questions.length} Answered</CardDescription>
             </CardHeader>
             <CardContent className="flex h-[calc(100vh-22rem)] flex-col">
               <ScrollArea className="flex-grow">
