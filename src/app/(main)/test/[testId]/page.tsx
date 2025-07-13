@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import type { Test } from '@/lib/data';
 
 function QuestionGrid({ questions, currentQuestionIndex, answers, onQuestionSelect, className }: { questions: any[], currentQuestionIndex: number, answers: AnswersState, onQuestionSelect: (index: number) => void, className?: string }) {
     return (
@@ -59,7 +60,7 @@ export default function TestPage() {
   const testId = params.testId as string;
   const { setTestResult, getTest } = useTestStore();
 
-  const [test, setTest] = useState(getTest(testId));
+  const [test, setTest] = useState<Test | undefined>();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswersState>({});
   const [isClient, setIsClient] = useState(false);
