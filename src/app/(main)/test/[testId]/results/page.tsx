@@ -18,6 +18,9 @@ export default function ResultsPage() {
   const { getTestResult, getTest } = useTestStore();
 
   const [score, setScore] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [unansweredCount, setUnansweredCount] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [isClient, setIsClient] = useState(false);
   
@@ -37,19 +40,33 @@ export default function ResultsPage() {
       return;
     }
 
-    let correctAnswers = 0;
+    let correct = 0;
+    let incorrect = 0;
+
     test.questions.forEach((q) => {
-      const userAnswer = result.answers[q.id] || [];
-      const isCorrect =
-        userAnswer.length === q.correctAnswers.length &&
-        userAnswer.every((ans) => q.correctAnswers.includes(ans));
-      if (isCorrect) {
-        correctAnswers++;
+      const userAnswer = result.answers[q.id];
+      if (!userAnswer || userAnswer.length === 0) {
+        // Unanswered
+      } else {
+        const isCorrect =
+          userAnswer.length === q.correctAnswers.length &&
+          userAnswer.every((ans) => q.correctAnswers.includes(ans));
+        if (isCorrect) {
+          correct++;
+        } else {
+          incorrect++;
+        }
       }
     });
+    
+    const finalScore = (correct * 1) - (incorrect * 0.33);
 
-    setScore(correctAnswers);
+    setCorrectCount(correct);
+    setIncorrectCount(incorrect);
     setTotalQuestions(test.questions.length);
+    setUnansweredCount(test.questions.length - correct - incorrect);
+    setScore(parseFloat(finalScore.toFixed(2)));
+
   }, [testId, getTestResult, router, test]);
 
   if (!isClient) {
@@ -59,8 +76,6 @@ export default function ResultsPage() {
   if (!test) {
       return <div className="flex h-screen items-center justify-center">Loading results...</div>;
   }
-
-  const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
   
   return (
     <div className="container mx-auto max-w-4xl py-10">
@@ -70,7 +85,13 @@ export default function ResultsPage() {
           <CardDescription className="text-lg">{test?.title}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-8">
-          <ResultsSummary percentage={percentage} score={score} totalQuestions={totalQuestions} />
+          <ResultsSummary 
+            score={score}
+            correctCount={correctCount}
+            incorrectCount={incorrectCount}
+            unansweredCount={unansweredCount}
+            totalQuestions={totalQuestions} 
+          />
           
           <div className="flex w-full flex-col gap-4 sm:flex-row sm:justify-center">
             <Button asChild variant="outline">
