@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Syringe } from "lucide-react"
+import { Stethoscope } from "lucide-react"
 
 export default function LoginPage() {
   return (
@@ -18,7 +18,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
-             <Syringe className="h-10 w-10 text-primary" />
+             <Stethoscope className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="font-headline text-3xl">NurseUp</CardTitle>
           <CardDescription>Your partner in nursing exam success.</CardDescription>

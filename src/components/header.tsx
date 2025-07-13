@@ -13,14 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Syringe, LayoutDashboard, History, LogOut, Wand2 } from 'lucide-react';
+import { Stethoscope, LayoutDashboard, History, LogOut, Wand2 } from 'lucide-react';
 
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
       <div className="container flex h-16 items-center">
         <Link href="/dashboard" className="flex items-center gap-2 text-lg font-bold text-foreground">
-          <Syringe className="h-6 w-6 text-primary" />
+          <Stethoscope className="h-6 w-6 text-primary" />
           <h1 className="font-headline text-2xl">NurseUp</h1>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
