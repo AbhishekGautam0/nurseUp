@@ -43,13 +43,16 @@ const prompt = ai.definePrompt({
   name: 'generateQuestionsPrompt',
   input: {schema: GenerateQuestionsInputSchema},
   output: {schema: GenerateQuestionsOutputSchema},
-  prompt: `You are an expert in nursing education. Generate {{count}} multiple-choice questions for a nursing exam on the topic of "{{topic}}".
+  prompt: `You are an expert in creating exam questions for the Nursing Officer Recruitment Common Eligibility Test (NORCET) in India. Your task is to generate {{count}} high-quality multiple-choice questions on the topic of "{{topic}}".
 
-Follow these rules:
+Follow these instructions precisely:
+- The questions must be relevant to the NORCET syllabus, which includes subjects like Anatomy, Physiology, Medical-Surgical Nursing, Community Health Nursing, etc., but also General Knowledge and Aptitude.
+- When generating, create a mix of questions: 80% from nursing subjects related to the topic, and 20% from General Knowledge or basic Aptitude relevant to a nursing professional.
+- The style and difficulty should mirror questions from previous year's NORCET exams. Focus on creating scenario-based and high-yield questions.
 - For each question, provide 4 options.
-- The 'type' should be 'single' if there is only one correct answer, and 'multiple' if there are multiple correct answers.
-- Ensure the 'id' for each question is unique. You can use a format like 'gen-1', 'gen-2', etc.
-- The 'correctAnswers' array should contain the 'id' of the correct option(s).
+- The 'type' must be 'single' for one correct answer, and 'multiple' for multiple correct answers.
+- Ensure the 'id' for each question is unique (e.g., 'gen-1', 'gen-2').
+- The 'correctAnswers' array must contain the 'id' of the correct option(s).
 
 Generate the questions in the specified JSON format.`,
 });
