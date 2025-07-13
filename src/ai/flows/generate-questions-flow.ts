@@ -54,7 +54,7 @@ Follow these instructions precisely:
 - Ensure the 'id' for each question is unique (e.g., 'gen-1', 'gen-2').
 - The 'correctAnswers' array must contain the 'id' of the correct option(s).
 
-Generate the questions in the specified JSON format. Ensure every question object in the array is complete and adheres to the required schema.`,
+Generate the questions in the specified JSON format. Ensure every single question object in the array is complete and adheres to the required schema, containing all required fields: id, text, options, correctAnswers, and type. Do not leave any object incomplete.`,
 });
 
 
