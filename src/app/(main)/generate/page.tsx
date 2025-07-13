@@ -113,7 +113,7 @@ export default function GeneratePage() {
                 id="count"
                 type="number"
                 value={count}
-                onChange={(e) => setCount(parseInt(e.target.value, 10))}
+                onChange={(e) => setCount(parseInt(e.target.value, 10) || 0)}
                 min="1"
                 max="25"
                 disabled={loading}
