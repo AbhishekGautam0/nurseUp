@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { TestTimer } from '@/components/test-timer';
 import { QuestionDisplay } from '@/components/question-display';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import {
@@ -105,9 +105,10 @@ export default function TestPage() {
         <Card className="sticky top-24">
           <CardHeader>
             <CardTitle className="text-lg">Questions</CardTitle>
+            <CardDescription>{test.questions.length} total</CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[calc(100vh-22rem)]">
+            <ScrollArea className="h-[calc(100vh-24rem)]">
               <div className="grid grid-cols-5 gap-2 pr-4">
                 {test.questions.map((q, i) => (
                   <Button

@@ -82,9 +82,9 @@ export const tests: Test[] = [
   },
   {
     id: '2',
-    title: 'Medical-Surgical Nursing I',
-    description: 'Test your understanding of common medical-surgical conditions and nursing interventions.',
-    duration: 20,
+    title: 'NORCET Practice Exam I',
+    description: 'A model exam based on the NORCET pattern, covering nursing subjects and general aptitude.',
+    duration: 180,
     category: 'practice',
     questions: [
       {
@@ -122,6 +122,115 @@ export const tests: Test[] = [
             { id: 'd', text: 'Respiratory rate' }
         ],
         correctAnswers: ['c'],
+        type: 'single',
+      },
+      {
+        id: '2-4',
+        text: 'The "rule of nines" is used for which purpose in emergency care?',
+        options: [
+            { id: 'a', text: 'Estimating the percentage of body surface area burned' },
+            { id: 'b', text: 'Calculating drug dosages for children' },
+            { id: 'c', text: 'Assessing the level of consciousness' },
+            { id: 'd', text: 'Determining the type of fracture' }
+        ],
+        correctAnswers: ['a'],
+        type: 'single',
+      },
+      {
+        id: '2-5',
+        text: 'Which vitamin is essential for the synthesis of clotting factors?',
+        options: [
+            { id: 'a', text: 'Vitamin A' },
+            { id: 'b', text: 'Vitamin C' },
+            { id: 'c', text: 'Vitamin D' },
+            { id: 'd', text: 'Vitamin K' }
+        ],
+        correctAnswers: ['d'],
+        type: 'single',
+      },
+      {
+        id: '2-6',
+        text: 'What is the primary purpose of the "Bag-Valve-Mask" (BVM) device?',
+        options: [
+            { id: 'a', text: 'To administer medications' },
+            { id: 'b', text: 'To provide positive pressure ventilation' },
+            { id: 'c', text: 'To monitor heart rhythm' },
+            { id: 'd', text: 'To suction airway secretions' }
+        ],
+        correctAnswers: ['b'],
+        type: 'single',
+      },
+      {
+        id: '2-7',
+        text: 'A nurse is providing teaching about the "MMR" vaccine. The nurse should explain that this vaccine provides immunity against which diseases? (Select all that apply)',
+        options: [
+            { id: 'a', text: 'Meningitis' },
+            { id: 'b', text: 'Measles' },
+            { id: 'c', text: 'Mumps' },
+            { id: 'd', text: 'Rotavirus' },
+            { id: 'e', text: 'Rubella' }
+        ],
+        correctAnswers: ['b', 'c', 'e'],
+        type: 'multiple',
+      },
+      {
+        id: '2-8',
+        text: 'The concept of "Asepsis" in nursing practice refers to:',
+        options: [
+            { id: 'a', text: 'The process of wound healing' },
+            { id: 'b', text: 'The absence of disease-causing microorganisms' },
+            { id: 'c', text: 'The administration of antibiotics' },
+            { id: 'd', text: 'The ethical principles of nursing' }
+        ],
+        correctAnswers: ['b'],
+        type: 'single',
+      },
+      {
+        id: '2-9',
+        text: 'Which is the largest gland in the human body?',
+        options: [
+            { id: 'a', text: 'Adrenal' },
+            { id: 'b', text: 'Liver' },
+            { id: 'c', text: 'Pancreas' },
+            { id: 'd', text: 'Thyroid' }
+        ],
+        correctAnswers: ['b'],
+        type: 'single',
+      },
+      {
+        id: '2-10',
+        text: 'What is the capital city of Australia?',
+        options: [
+            { id: 'a', text: 'Sydney' },
+            { id: 'b', text: 'Melbourne' },
+            { id: 'c', text: 'Canberra' },
+            { id: 'd', text: 'Perth' }
+        ],
+        correctAnswers: ['c'],
+        type: 'single',
+      },
+       {
+        id: '2-11',
+        text: 'In which stage of labor is the placenta delivered?',
+        options: [
+            { id: 'a', text: 'First stage' },
+            { id: 'b', text: 'Second stage' },
+            { id: 'c', text: 'Third stage' },
+            { id: 'd', text: 'Fourth stage' }
+        ],
+        correctAnswers: ['c'],
+        type: 'single',
+      },
+      {
+        id: '2-12',
+        text: 'Which of the following is an example of an isotonic IV solution?',
+        options: [
+            { id: 'a', text: '0.45% Sodium Chloride' },
+            { id: 'b', text: '0.9% Sodium Chloride' },
+            { id: 'c', text: '3% Sodium Chloride' },
+            { id: 'd', text: 'Dextrose 5% in 0.45% Saline' }
+        ],
+        correctAnswers: ['b'],
         type: 'single',
       },
     ],
