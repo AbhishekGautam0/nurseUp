@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Syringe, LayoutDashboard, History, LogOut } from 'lucide-react';
+import { Syringe, LayoutDashboard, History, LogOut, Wand2 } from 'lucide-react';
 
 export function Header() {
   return (
@@ -48,6 +48,9 @@ export function Header() {
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/review"><History className="mr-2 h-4 w-4" />Review Tests</Link>
+              </DropdownMenuItem>
+               <DropdownMenuItem asChild>
+                <Link href="/generate"><Wand2 className="mr-2 h-4 w-4" />Generate Questions</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
