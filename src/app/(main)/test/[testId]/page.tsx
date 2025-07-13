@@ -123,7 +123,11 @@ export default function TestPage() {
                     variant={currentQuestionIndex === i ? 'default' : answers[q.id]?.length > 0 ? 'secondary' : 'outline'}
                     size="icon"
                     onClick={() => setCurrentQuestionIndex(i)}
-                    className={cn("h-10 w-10 rounded-full", currentQuestionIndex === i && "ring-2 ring-primary-foreground ring-offset-2 ring-offset-primary")}
+                    className={cn(
+                      "h-10 w-10 rounded-full", 
+                      currentQuestionIndex === i && "ring-2 ring-primary-foreground ring-offset-2 ring-offset-primary",
+                      answers[q.id]?.length > 0 && "bg-green-600 hover:bg-green-700 text-white"
+                      )}
                   >
                     {i + 1}
                   </Button>
