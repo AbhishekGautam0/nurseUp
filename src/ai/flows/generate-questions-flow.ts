@@ -54,7 +54,7 @@ Follow these instructions precisely:
 - Ensure the 'id' for each question is unique (e.g., 'gen-1', 'gen-2').
 - The 'correctAnswers' array must contain the 'id' of the correct option(s).
 
-Generate the questions in the specified JSON format.`,
+Generate the questions in the specified JSON format. Ensure every question object in the array is complete and adheres to the required schema.`,
 });
 
 
@@ -63,6 +63,9 @@ const generateQuestionsFlow = ai.defineFlow(
     name: 'generateQuestionsFlow',
     inputSchema: GenerateQuestionsInputSchema,
     outputSchema: GenerateQuestionsOutputSchema,
+    config: {
+        retries: 2, // Retry up to 2 times if the output validation fails
+    }
   },
   async (input) => {
     const {output} = await prompt(input);
