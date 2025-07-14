@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { generateQuestions, type GenerateQuestionsOutput } from '@/ai/flows/generate-questions-flow';
+import { type GenerateQuestionsOutput } from '@/ai/flows/generate-questions-flow';
 import { useTestStore } from '@/hooks/use-test-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +47,21 @@ export default function GeneratePage() {
     setNewTestTitle(`Practice Test: ${topic}`);
     setNewTestDescription(`A set of ${count} AI-generated questions about ${topic}.`);
     try {
-      const generated = await generateQuestions({ topic, count });
+       const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic, count }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || 'Failed to generate questions');
+      }
+
+      const generated = await response.json();
+
        if (generated && generated.questions) {
         // Assign temporary unique IDs for the review UI
         const questionsWithTempIds = withTempIds(generated.questions as Question[]);
@@ -60,7 +74,7 @@ export default function GeneratePage() {
       toast({
         variant: "destructive",
         title: "Error Generating Questions",
-        description: "There was a problem generating questions. Please try again.",
+        description: error instanceof Error ? error.message : "There was a problem generating questions. Please try again.",
       });
     }
     setLoading(false);
