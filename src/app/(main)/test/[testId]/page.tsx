@@ -58,7 +58,7 @@ export default function TestPage() {
   const router = useRouter();
   const params = useParams();
   const testId = params.testId as string;
-  const { setTestResult, getTest } = useTestStore();
+  const { setTestResult, getTest, getTestResult } = useTestStore();
 
   const [test, setTest] = useState<Test | undefined>();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -82,24 +82,44 @@ export default function TestPage() {
            setTest(refoundTest);
         }
       }, 500);
-    } else {
-      setTest(foundTest);
-      try {
-        const savedState = sessionStorage.getItem(getSessionStorageKey());
-        if (savedState) {
-          const { savedAnswers, savedTimeLeft, savedQuestionIndex } = JSON.parse(savedState);
-          setAnswers(savedAnswers);
-          setTimeLeft(savedTimeLeft);
-          setCurrentQuestionIndex(savedQuestionIndex);
-        } else {
-          setTimeLeft(foundTest.duration * 60);
-        }
-      } catch (error) {
-        // Could not load test state from session storage, start fresh
+      return;
+    } 
+    
+    setTest(foundTest);
+    
+    // If a result for this test already exists, it means we are re-taking it.
+    // We should clear session storage and start fresh.
+    const existingResult = getTestResult(testId);
+    const sessionState = sessionStorage.getItem(getSessionStorageKey());
+
+    if (existingResult && !sessionState) {
+        // Clear any lingering session state just in case, and start fresh
+        sessionStorage.removeItem(getSessionStorageKey());
+        setAnswers({});
+        setCurrentQuestionIndex(0);
         setTimeLeft(foundTest.duration * 60);
-      }
+        return;
     }
-  }, [testId, getTest, router, getSessionStorageKey]);
+    
+    try {
+      if (sessionState) {
+        const { savedAnswers, savedTimeLeft, savedQuestionIndex } = JSON.parse(sessionState);
+        setAnswers(savedAnswers);
+        setTimeLeft(savedTimeLeft);
+        setCurrentQuestionIndex(savedQuestionIndex);
+      } else {
+        setTimeLeft(foundTest.duration * 60);
+        setAnswers({});
+        setCurrentQuestionIndex(0);
+      }
+    } catch (error) {
+      // Could not load test state from session storage, start fresh
+      setTimeLeft(foundTest.duration * 60);
+      setAnswers({});
+      setCurrentQuestionIndex(0);
+    }
+    
+  }, [testId, getTest, router, getSessionStorageKey, getTestResult]);
   
   // Save state to session storage whenever it changes
   useEffect(() => {
@@ -125,6 +145,7 @@ export default function TestPage() {
   const handleSubmit = useCallback(() => {
     if (!test) return;
     setTestResult(test.id, answers);
+    // Clear session storage BEFORE navigating away to ensure a clean state for the next visit
     sessionStorage.removeItem(getSessionStorageKey());
     router.push(`/test/${test.id}/results`);
   }, [test, answers, setTestResult, router, getSessionStorageKey]);
