@@ -1,3 +1,6 @@
+
+"use client";
+
 import Link from 'next/link';
 import {
   Avatar,
@@ -14,8 +17,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Stethoscope, LayoutDashboard, History, LogOut, Wand2 } from 'lucide-react';
+import { useTestStore } from '@/hooks/use-test-store';
+import { useEffect, useState } from 'react';
 
 export function Header() {
+  const { user } = useTestStore();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
       <div className="container flex h-16 items-center">
@@ -28,17 +44,17 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="https://placehold.co/100x100.png" alt="Student Nurse" data-ai-hint="person avatar"/>
-                  <AvatarFallback>SN</AvatarFallback>
+                  <AvatarImage src="https://placehold.co/100x100.png" alt={user.name} data-ai-hint="person avatar"/>
+                  <AvatarFallback>{isClient ? getInitials(user.name) : 'SN'}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Student Nurse</p>
+                  <p className="text-sm font-medium leading-none">{isClient ? user.name : 'Student Nurse'}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    student@nurseup.com
+                    {isClient ? user.email : 'student@nurseup.com'}
                   </p>
                 </div>
               </DropdownMenuLabel>

@@ -11,7 +11,14 @@ type TestResult = {
   submittedAt: string; // Using ISO string for serialization
 };
 
+type User = {
+    name: string;
+    email: string;
+}
+
 type TestStore = {
+  user: User;
+  setUser: (name: string, email: string) => void;
   tests: Test[];
   addTest: (test: Test) => void;
   deleteTest: (testId: string) => void;
@@ -26,6 +33,8 @@ type TestStore = {
 export const useTestStore = create<TestStore>()(
   persist(
     (set, get) => ({
+      user: { name: 'Student Nurse', email: 'student@nurseup.com' },
+      setUser: (name, email) => set({ user: { name, email } }),
       tests: initialTests,
       addTest: (test) => set((state) => ({ tests: [...state.tests, test] })),
       deleteTest: (testId) => set((state) => ({ tests: state.tests.filter(t => t.id !== testId) })),
