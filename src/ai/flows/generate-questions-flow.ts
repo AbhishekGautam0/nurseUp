@@ -62,12 +62,18 @@ const generateQuestionsFlow = ai.defineFlow(
     name: 'generateQuestionsFlow',
     inputSchema: GenerateQuestionsInputSchema,
     outputSchema: GenerateQuestionsOutputSchema,
-    config: {
-        retries: 3, // Retry up to 3 times if the output validation fails
-    }
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      // First attempt with the default model
+      console.log('Attempting to generate questions with default model...');
+      const {output} = await prompt(input);
+      return output!;
+    } catch (error) {
+      console.warn('Default model failed. Retrying with fallback model...', error);
+      // Fallback attempt with a different model
+      const {output} = await prompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
+      return output!;
+    }
   }
 );
