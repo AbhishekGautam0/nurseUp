@@ -95,7 +95,7 @@ export default function TestPage() {
           setTimeLeft(foundTest.duration * 60);
         }
       } catch (error) {
-        console.error("Could not load test state from session storage", error);
+        // Could not load test state from session storage, start fresh
         setTimeLeft(foundTest.duration * 60);
       }
     }
@@ -112,7 +112,7 @@ export default function TestPage() {
           };
           sessionStorage.setItem(getSessionStorageKey(), JSON.stringify(stateToSave));
       } catch (error) {
-          console.error("Could not save test state to session storage", error)
+          // Could not save test state to session storage
       }
 
   }, [answers, timeLeft, currentQuestionIndex, isClient, getSessionStorageKey]);
