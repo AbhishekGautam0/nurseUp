@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Stethoscope, Mail, KeyRound, Loader2 } from "lucide-react"
+import { Stethoscope, KeyRound, Loader2 } from "lucide-react"
 import { useTestStore } from "@/hooks/use-test-store";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,8 +23,8 @@ export default function LoginPage() {
   const { setUser } = useTestStore();
   const { toast } = useToast();
 
-  const [email, setEmail] = useState("deepika@gmail.com");
-  const [password, setPassword] = useState("Deepika@05");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -45,8 +45,8 @@ export default function LoginPage() {
           title: "Invalid Credentials",
           description: "Please check your email and password.",
       });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -78,7 +78,7 @@ export default function LoginPage() {
         </CardContent>
          <CardFooter className="flex flex-col gap-4">
           <p className="text-xs text-muted-foreground text-center">
-            Enter your credentials to access your dashboard.
+            Welcome, Deepika! Please enter your credentials to access your dashboard.
           </p>
         </CardFooter>
       </Card>
