@@ -69,6 +69,15 @@ export default function TestPage() {
 
   const getSessionStorageKey = useCallback(() => `test-session-${testId}`, [testId]);
 
+  const handleSubmit = useCallback(() => {
+    if (!test) return;
+    setTestResult(test.id, answers);
+    // Clear session storage BEFORE navigating away to ensure a clean state for the next visit
+    sessionStorage.removeItem(getSessionStorageKey());
+    router.push(`/test/${test.id}/results`);
+  }, [test, answers, setTestResult, router, getSessionStorageKey]);
+
+
   // Load state from session storage on mount
   useEffect(() => {
     setIsClient(true);
@@ -87,13 +96,10 @@ export default function TestPage() {
     
     setTest(foundTest);
     
-    // If a result for this test already exists, it means we are re-taking it.
-    // We should clear session storage and start fresh.
     const existingResult = getTestResult(testId);
     const sessionState = sessionStorage.getItem(getSessionStorageKey());
 
     if (existingResult && !sessionState) {
-        // Clear any lingering session state just in case, and start fresh
         sessionStorage.removeItem(getSessionStorageKey());
         setAnswers({});
         setCurrentQuestionIndex(0);
@@ -113,7 +119,6 @@ export default function TestPage() {
         setCurrentQuestionIndex(0);
       }
     } catch (error) {
-      // Could not load test state from session storage, start fresh
       setTimeLeft(foundTest.duration * 60);
       setAnswers({});
       setCurrentQuestionIndex(0);
@@ -132,27 +137,29 @@ export default function TestPage() {
           };
           sessionStorage.setItem(getSessionStorageKey(), JSON.stringify(stateToSave));
       } catch (error) {
-          // Could not save test state to session storage
+          console.error("Could not save test state to session storage", error);
       }
 
   }, [answers, timeLeft, currentQuestionIndex, isClient, getSessionStorageKey]);
+
+  // Main timer logic moved to the parent component
+  useEffect(() => {
+    if (timeLeft === null) return;
+    if (timeLeft <= 0) {
+      handleSubmit();
+      return;
+    }
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime !== null ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, handleSubmit]);
 
 
   const handleAnswerChange = (questionId: string, answer: string[]) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
-
-  const handleSubmit = useCallback(() => {
-    if (!test) return;
-    setTestResult(test.id, answers);
-    // Clear session storage BEFORE navigating away to ensure a clean state for the next visit
-    sessionStorage.removeItem(getSessionStorageKey());
-    router.push(`/test/${test.id}/results`);
-  }, [test, answers, setTestResult, router, getSessionStorageKey]);
-
-  const handleTimeUp = useCallback(() => {
-    handleSubmit();
-  }, [handleSubmit]);
 
   const goToNext = () => {
     if (test && currentQuestionIndex < test.questions.length - 1) {
@@ -188,7 +195,7 @@ export default function TestPage() {
               <h1 className="font-headline text-3xl font-bold">{test.title}</h1>
               <p className="text-muted-foreground">{test.description}</p>
             </div>
-            <TestTimer initialSeconds={timeLeft} onTimeUp={handleTimeUp} onTick={setTimeLeft} />
+            <TestTimer seconds={timeLeft} />
           </header>
           
           <QuestionDisplay
