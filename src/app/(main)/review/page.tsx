@@ -11,9 +11,10 @@ import { format } from 'date-fns';
 import { History, ArrowRight } from 'lucide-react';
 
 export default function ReviewListPage() {
-  const { tests, results } = useTestStore();
+  const { tests, getResultsForCurrentUser } = useTestStore();
   const [completedTests, setCompletedTests] = useState<Test[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [results, setResults] = useState<{[testId: string]: any}>({});
 
   useEffect(() => {
     setIsClient(true);
@@ -21,11 +22,13 @@ export default function ReviewListPage() {
 
   useEffect(() => {
     if (isClient) {
-      const completedIds = Object.keys(results);
+      const userResults = getResultsForCurrentUser();
+      setResults(userResults);
+      const completedIds = Object.keys(userResults);
       const filteredTests = tests.filter(test => completedIds.includes(test.id));
       setCompletedTests(filteredTests);
     }
-  }, [results, tests, isClient]);
+  }, [getResultsForCurrentUser, tests, isClient]);
 
   if (!isClient) {
     return <div className="container py-8">Loading reviewable tests...</div>;

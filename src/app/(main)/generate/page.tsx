@@ -29,7 +29,7 @@ const withTempIds = (questions: Question[]): Question[] => {
 
 export default function GeneratePage() {
   const [topic, setTopic] = useState('Cardiology');
-  const [count, setCount] = useState(5);
+  const [count, setCount] = useState<number | ''>(5);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerateQuestionsOutput | null>(null);
   
@@ -42,6 +42,15 @@ export default function GeneratePage() {
 
 
   const handleGenerate = async () => {
+    if (!count || count < 1) {
+        toast({
+            variant: "destructive",
+            title: "Invalid Input",
+            description: "Please enter a valid number of questions (at least 1).",
+        });
+        return;
+    }
+
     setLoading(true);
     setResult(null);
     setNewTestTitle(`Practice Test: ${topic}`);
@@ -81,7 +90,7 @@ export default function GeneratePage() {
   };
 
   const handleSaveTest = () => {
-    if (!result || !newTestTitle) {
+    if (!result || !newTestTitle || !result.questions) {
       toast({
         variant: "destructive",
         title: "Cannot Save Test",
@@ -145,13 +154,17 @@ export default function GeneratePage() {
                 id="count"
                 type="number"
                 value={count}
-                onChange={(e) => setCount(parseInt(e.target.value, 10) || 0)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setCount(value === '' ? '' : parseInt(value, 10));
+                }}
                 min="1"
                 max="25"
+                placeholder="e.g., 10"
                 disabled={loading}
               />
             </div>
-            <Button onClick={handleGenerate} disabled={loading} className="w-full" style={{backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))'}}>
+            <Button onClick={handleGenerate} disabled={loading || !count} className="w-full" style={{backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))'}}>
               {loading ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
               ) : (
@@ -196,7 +209,7 @@ export default function GeneratePage() {
                             <Skeleton className="h-8 w-4/5" />
                             <Skeleton className="h-8 w-2/3" />
                             </div>
-                        ) : result ? (
+                        ) : result && result.questions ? (
                            <ScrollArea className="h-full w-full rounded-md bg-background p-4">
                              <div className="space-y-6">
                                 {result.questions.map((q, i) => (
