@@ -26,7 +26,7 @@ export const initialTests: Test[] = [
     id: 'norcet-practice-1',
     title: 'NORCET Practice Exam I',
     description: 'A model exam based on the NORCET pattern, covering nursing subjects and general aptitude.',
-    duration: 90,
+    duration: 60,
     category: 'practice',
     questions: [
       {
