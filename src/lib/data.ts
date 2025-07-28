@@ -1039,7 +1039,7 @@ export const initialTests: Test[] = [
         options: [
           { id: 'a', text: 'Appoints a person to make healthcare decisions for the client.' },
           { id: 'b', text: 'Specifies the client\'s wishes regarding medical treatment if they become incapacitated.' },
-          { id:- 'c', text: 'Details the distribution of the client\'s assets after death.' },
+          { id: 'c', text: 'Details the distribution of the client\'s assets after death.' },
           { id: 'd', text: 'Is the same as a "Do Not Resuscitate" (DNR) order.' }
         ],
         correctAnswers: ['b'],
