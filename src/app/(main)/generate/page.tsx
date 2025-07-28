@@ -103,7 +103,7 @@ export default function GeneratePage() {
       id: `test-${Date.now()}`,
       title: newTestTitle,
       description: newTestDescription,
-      duration: result.questions.length * 1, // 1 mins per question
+      duration: Math.ceil((result.questions.length * 40) / 60), // 40 sec each question
       questions: result.questions.map((q, index) => ({...q, id: `q-${index}`})) as Question[], // Finalize IDs on save
       category: 'practice',
     };
